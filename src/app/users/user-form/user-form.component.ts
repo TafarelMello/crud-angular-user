@@ -17,28 +17,20 @@ export class UserFormComponent implements OnInit {
   user: User = new User();
 
   constructor(
-    formBuilder: FormBuilder,
+    private formBuilder: FormBuilder,
     private router: Router,
     private route: ActivatedRoute,
     private usersService: UsersService
   ) {
-    this.form = formBuilder.group({
-      name: ['', [Validators.required, Validators.minLength(3)]],
-      email: [
-        '',
-        [
-          Validators.required,
-          BasicValidators.email
-          // tslint:disable-next-line:max-line-length
-          // Validators.pattern("[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
-        ]
-      ],
-      phone: [],
-      address: formBuilder.group({
-        street: ['', Validators.minLength(3)],
-        suite: [],
-        city: ['', Validators.maxLength(30)],
-        zipcode: ['', Validators.pattern('^([0-9]){5}([-])([0-9]){4}$')]
+    this.form = this.formBuilder.group({
+      name: [null, [Validators.required, Validators.minLength(3)]],
+      email: [null, [Validators.required, Validators.email]],
+      phone: [null],
+      address: this.formBuilder.group({
+        street: [null, Validators.minLength(3)],
+        suite: [null],
+        city: [null, Validators.maxLength(30)],
+        zipcode: [null, Validators.pattern('^([0-9]){5}([-])([0-9]){4}$')]
       })
     });
   }
@@ -54,7 +46,7 @@ export class UserFormComponent implements OnInit {
       this.usersService.getUser(id).subscribe(
         user => (this.user = user),
         response => {
-          if (response.status == 404) {
+          if (response.status === 404) {
             this.router.navigate(['NotFound']);
           }
         }
